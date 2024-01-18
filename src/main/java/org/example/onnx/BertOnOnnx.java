@@ -44,23 +44,23 @@ public class BertOnOnnx {
     }
 
     public static void main(String[] args) throws OrtException {
-        BertTokenizer bertTokenizer = new BertTokenizer("G:\\qzd\\JavaProject\\QZD_GROUP\\bird-query\\mleap-py\\bert_pretrain\\vocab.txt");
-        Map<String, OnnxTensor> inputMap = bertTokenizer.tokenizeOnnxTensor(Arrays.asList("备考2012高考作文必读美文50篇(一)"));
+        //Bert-Chinese-Text-Classification-Pytorch项目的 vocab.txt
+        String vocabPath = "G:\\qzd\\JavaProject\\QZD_GROUP\\bird-query\\Bert-Chinese-Text-Classification-Pytorch\\bert_pretrain\\vocab.txt";
+        //bert_to_onnx.py执行后的模型文件
+        String modelPath = "G:\\qzd\\JavaProject\\QZD_GROUP\\bird-query\\Bert-Chinese-Text-Classification-Pytorch\\THUCNews\\saved_dict\\model.onnx";
 
+        String query ="备考2012高考作文必读美文50篇(一)";
 
-        String modelPath = "G:\\qzd\\JavaProject\\QZD_GROUP\\bird-query\\mleap-py\\model.onnx";
+        BertTokenizer bertTokenizer = new BertTokenizer(vocabPath);
+        Map<String, OnnxTensor> inputMap = bertTokenizer.tokenizeOnnxTensor(Arrays.asList(query));
+
         OrtEnvironment env = OrtEnvironment.getEnvironment();
-        Map<String, OnnxTensor> container = new HashMap<>();
-
-
-        // Request all outputs, supply all inputs
-        container = inputMap;
 
         OrtSession.SessionOptions options = new OrtSession.SessionOptions();
         try (OrtSession session = env.createSession(modelPath, options)) {
             // Load code not shown for brevity.
             // Run the inference
-            try (OrtSession.Result results = session.run(container)) {
+            try (OrtSession.Result results = session.run(inputMap)) {
                 // Only iterates once
                 for (Map.Entry<String, OnnxValue> r : results) {
                     OnnxValue resultValue = r.getValue();
