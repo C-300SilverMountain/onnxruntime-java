@@ -122,7 +122,7 @@ public class BertTokenizer implements Tokenizer {
             throws OrtException {
         OrtEnvironment env = OrtEnvironment.getEnvironment();
         long[][] textTokensIds = new long[texts.size()][];
-        long[][] typeIds = new long[texts.size()][];
+        long[][] masks = new long[texts.size()][];
         int rowIndex = 0;
         int maxColumn = 32;
         for (String text : texts) {
@@ -136,24 +136,21 @@ public class BertTokenizer implements Tokenizer {
             }
 //            tokenIds[index++] = tokenIdMap.get(sepToken);
             textTokensIds[rowIndex] = tokenIds;
-            typeIds[rowIndex++] = buildTokenTypeArray(index);
+            masks[rowIndex++] = buildTokenTypeArray(index);
             maxColumn = Math.max(maxColumn, index);
         }
 
-        // padding 0
+        // 长度不足maxColumn，填充0，必须保证长度达maxColumn
         for (int row = 0; row < texts.size(); row++) {
             if (textTokensIds[row].length < maxColumn) {
                 // padding 0
                 textTokensIds[row] = paddingZero(textTokensIds[row], maxColumn - textTokensIds[row].length);
-                typeIds[row] = paddingZero(typeIds[row], maxColumn - typeIds[row].length);
+                masks[row] = paddingZero(masks[row], maxColumn - masks[row].length);
             }
         }
 
-        typeIds[0] = new long[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-
         OnnxTensor ids = OnnxTensor.createTensor(env, new long[][]{textTokensIds[0]});
-        OnnxTensor tokenTypeIds = OnnxTensor.createTensor(env, new long[][]{typeIds[0]});
+        OnnxTensor tokenTypeIds = OnnxTensor.createTensor(env, new long[][]{masks[0]});
         Map<String, OnnxTensor> inputMap = new HashMap<>();
         inputMap.put("ids", ids);
         inputMap.put("mask", tokenTypeIds);
@@ -163,11 +160,11 @@ public class BertTokenizer implements Tokenizer {
     }
 
     long[] buildTokenTypeArray(int size) {
-        long[] typeIds = new long[size];
+        long[] mask = new long[size];
         for (int i = 0; i < size; i++) {
-            typeIds[i] = 0;
+            mask[i] = 1;
         }
-        return typeIds;
+        return mask;
     }
 
     public int vocabSize() {

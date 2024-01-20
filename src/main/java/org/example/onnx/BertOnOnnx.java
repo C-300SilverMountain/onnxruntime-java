@@ -2,6 +2,9 @@ package org.example.onnx;
 
 
 import ai.onnxruntime.*;
+import cn.hutool.core.math.MathUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.json.JSONUtil;
 import org.example.onnx.tokenizer.BertTokenizer;
 
 import java.util.Arrays;
@@ -67,7 +70,9 @@ public class BertOnOnnx {
                     OnnxTensor resultTensor = (OnnxTensor) resultValue;
                     int prediction = MaxProbability(resultTensor);
                     String category = categoryMap.get(String.valueOf(prediction));
+                    float[] softmax = softmax(resultTensor);
                     System.out.println("Prediction: " + category);
+                    System.out.println("softmax: " + JSONUtil.toJsonStr(softmax));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -90,5 +95,33 @@ public class BertOnOnnx {
         }
         return maxIndex;
 
+    }
+
+    /**
+     * 计算概率值
+     *
+     * @param probabilities The input array.
+     * @return The softmax of the input.
+     */
+    public static float[] softmax(OnnxTensor probabilities) throws OrtException{
+        float[][] labelOutput = (float[][]) probabilities.getValue();
+
+        float[] input = labelOutput[0];
+        double[] tmp = new double[input.length];
+        double sum = 0.0;
+        for (int i = 0; i < input.length; i++) {
+            double val = Math.exp(input[i]);
+            sum += val;
+            tmp[i] = val;
+        }
+
+        float[] output = new float[input.length];
+        for (int i = 0; i < output.length; i++) {
+//            output[i] = (float) (tmp[i] / sum);
+            float labelProb = Math.round(tmp[i] / sum * 1000) * 1.0F / 1000;
+            output[i] = labelProb;
+        }
+
+        return output;
     }
 }
