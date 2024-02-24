@@ -134,7 +134,7 @@ public class BertTokenizer implements Tokenizer {
             for (String s : tokens) {
                 tokenIds[index++] = tokenIdMap.get(s);
             }
-//            tokenIds[index++] = tokenIdMap.get(sepToken);
+            tokenIds[index++] = tokenIdMap.get(sepToken);
             textTokensIds[rowIndex] = tokenIds;
             masks[rowIndex++] = buildTokenTypeArray(index);
             maxColumn = Math.max(maxColumn, index);
@@ -159,10 +159,63 @@ public class BertTokenizer implements Tokenizer {
         return inputMap;
     }
 
+    public Map<String, OnnxTensor> tokenizeOnnxTensorForRoberta(List<String> texts)
+            throws OrtException {
+        OrtEnvironment env = OrtEnvironment.getEnvironment();
+        long[][] textTokensIds = new long[texts.size()][];
+        long[][] masks = new long[texts.size()][];
+        long[][] types = new long[texts.size()][];
+        int rowIndex = 0;
+        int maxColumn = 300;
+        for (String text : texts) {
+
+            List<String> tokens = tokenize(text);
+            long[] tokenIds = new long[tokens.size() + 2];
+            int index = 0;
+            tokenIds[index++] = tokenIdMap.get(clsToken);
+            for (String s : tokens) {
+                tokenIds[index++] = tokenIdMap.get(s);
+            }
+            tokenIds[index++] = tokenIdMap.get(sepToken);
+            textTokensIds[rowIndex] = tokenIds;
+            types[rowIndex] = buildTypeArray(maxColumn);
+
+            masks[rowIndex++] = buildTokenTypeArray(index);
+            maxColumn = Math.max(maxColumn, index);
+        }
+
+        // 长度不足maxColumn，填充0，必须保证长度达maxColumn
+        for (int row = 0; row < texts.size(); row++) {
+            if (textTokensIds[row].length < maxColumn) {
+                // padding 0
+                textTokensIds[row] = paddingZero(textTokensIds[row], maxColumn - textTokensIds[row].length);
+                masks[row] = paddingZero(masks[row], maxColumn - masks[row].length);
+            }
+        }
+
+        OnnxTensor ids = OnnxTensor.createTensor(env, new long[][]{textTokensIds[0]});
+        OnnxTensor attentionMask = OnnxTensor.createTensor(env, new long[][]{masks[0]});
+        OnnxTensor tokenType = OnnxTensor.createTensor(env, new long[][]{types[0]});
+        Map<String, OnnxTensor> inputMap = new HashMap<>();
+        inputMap.put("input_ids", ids);
+        inputMap.put("attention_mask", attentionMask);
+        inputMap.put("token_type_ids", tokenType);
+
+        return inputMap;
+    }
+
     long[] buildTokenTypeArray(int size) {
         long[] mask = new long[size];
         for (int i = 0; i < size; i++) {
             mask[i] = 1;
+        }
+        return mask;
+    }
+
+    long[] buildTypeArray(int size) {
+        long[] mask = new long[size];
+        for (int i = 0; i < size; i++) {
+            mask[i] = 0;
         }
         return mask;
     }

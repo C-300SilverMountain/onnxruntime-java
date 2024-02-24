@@ -2,8 +2,6 @@ package org.example.onnx;
 
 
 import ai.onnxruntime.*;
-import cn.hutool.core.math.MathUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
 import org.example.onnx.tokenizer.BertTokenizer;
 
@@ -25,11 +23,12 @@ import java.util.Map;
  * https://neuml.hashnode.dev/export-and-run-models-with-onnx
  * https://github.com/microsoft/onnxruntime/blob/main/java/src/test/java/ai/onnxruntime/InferenceTest.java
  * <p>
+ * https://github.com/jadepeng/bertTokenizer/blob/main/src/main/java/org/jadestudio/BertTokenizer.java
  * https://cloud.tencent.com/developer/article/2343710
  * https://github.com/microsoft/onnxruntime/issues/10142
  * https://www.jianshu.com/p/777d07037d00
  */
-public class BertOnOnnx {
+public class RunBertOnOnnx {
 
     static Map<String, String> categoryMap = new HashMap<>();
 
