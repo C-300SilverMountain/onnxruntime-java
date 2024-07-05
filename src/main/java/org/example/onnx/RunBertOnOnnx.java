@@ -27,6 +27,7 @@ import java.util.Map;
  * https://cloud.tencent.com/developer/article/2343710
  * https://github.com/microsoft/onnxruntime/issues/10142
  * https://www.jianshu.com/p/777d07037d00
+ * https://onnxruntime.ai/docs/get-started/with-java.html
  */
 public class RunBertOnOnnx {
 

@@ -25,6 +25,11 @@ public class RunChineseRobertaOnOnnx {
         OrtEnvironment env = OrtEnvironment.getEnvironment();
 
         OrtSession.SessionOptions options = new OrtSession.SessionOptions();
+
+//        OrtCUDAProviderOptions cudaOpts = new OrtCUDAProviderOptions(0);
+//        cudaOpts.add("gpu_mem_limit", "" + (512 * 1024 * 1024));
+//        options.addCUDA(cudaOpts);
+
         try (OrtSession session = env.createSession(modelPath, options)) {
             // Load code not shown for brevity.
             // Run the inference

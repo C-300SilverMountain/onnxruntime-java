@@ -1,0 +1,7 @@
+server:
+  port: 9999
+  tomcat:
+    threads:
+      max: 800
+      min-spare: 100
+    accept-count: 1000
