@@ -24,6 +24,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-cloud.version>Hoxton.SR12</spring-cloud.version>
         <log4j.version>2.20.0</log4j.version>
+
+        <javacv.version>1.5.9</javacv.version>
+        <system.windowsx64>windows-x86_64</system.windowsx64>
+        <system.liunx64>linux-x86_64</system.liunx64>
     </properties>
 
     <dependencies>
@@ -78,18 +82,16 @@
             <scope>test</scope>
         </dependency>
 
-        <!--cpu-->
-<!--        <dependency>-->
-<!--            <groupId>org.bytedeco</groupId>-->
-<!--            <artifactId>onnxruntime-platform</artifactId>-->
-<!--            <version>1.15.0-1.5.9</version>-->
-<!--        </dependency>-->
-
-        <!--gpu-->
         <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>onnxruntime-platform-gpu</artifactId>
-            <version>1.15.0-1.5.9</version>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.18</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
         <dependency>
@@ -98,18 +100,117 @@
             <version>0.20.0</version>
         </dependency>
 
+        <!--onnxruntime-->
+
+        <!--注：版本号必须满足要求：https://onnxruntime.ai/docs/execution-providers/TensorRT-ExecutionProvider.html-->
+        <!--
+        Requirements
+            ONNX Runtime	TensorRT	  CUDA/cuDNN
+            1.18-main	    10.0	        11.8, 12.2
+            1.17	        8.6	            11.8, 12.2
+            1.16	        8.6            	11.8
+            1.15        	8.6            	11.8
+            1.14        	8.5	            11.6
+            1.12-1.13	    8.4            	11.4
+            1.11        	8.2	            11.4
+            1.10        	8.0            	11.4
+            1.9           	8.0	            11.4
+            1.7-1.8        	7.2            	11.0.3
+            1.5-1.6         7.1            	10.2
+            1.2-1.4        	7.0            	10.1
+            1.0-1.1         6.0            	10.0
+            -->
+        <!--版本检测-->
+        <!--
+        查看CUDA/cuDNN版本：nvcc - -version
+        安装CUDA/cuDNN：https://gist.github.com/denguir/b21aa66ae7fb1089655dd9de8351a202#install-cudnn
+        案例：
+        nvcc - -version
+        nvcc: NVIDIA (R) Cuda compiler driver
+        Copyright (c) 2005-2023 NVIDIA Corporation
+        Built on Mon_Apr__3_17:16:06_PDT_2023
+        Cuda compilation tools, release 12.1, V12.1.105    （这时候得要求：ONNX Runtime 必须1.18-main以上）
+        Build cuda_12.1.r12.1/compiler.32688072_0
+        -->
+
+        <!-- jar清单参考：https://www.junpzx.cn/archives/javadiao-yong-onnxruntimetui-li -->
+        <!--cpu-->
+<!--        <dependency>-->
+<!--            <groupId>org.bytedeco</groupId>-->
+<!--            <artifactId>onnxruntime-platform</artifactId>-->
+<!--            <version>1.15.0-1.5.9</version>-->
+<!--        </dependency>-->
+
+        <!--gpu-->
+<!--        <dependency>-->
+<!--            <groupId>org.bytedeco</groupId>-->
+<!--            <artifactId>onnxruntime-platform-gpu</artifactId>-->
+<!--            <version>1.15.0-1.5.9</version>-->
+<!--        </dependency>-->
+
+
+
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.8.18</version>
+            <groupId>com.microsoft.onnxruntime</groupId>
+            <artifactId>onnxruntime_gpu</artifactId>
+            <version>1.18.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv</artifactId>
+            <version>${javacv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacpp-platform</artifactId>
+            <version>${javacv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>opencv</artifactId>
+            <version>4.7.0-${javacv.version}</version>
+            <classifier>${system.windowsx64}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>opencv</artifactId>
+            <version>4.7.0-${javacv.version}</version>
+            <classifier>${system.liunx64}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>openblas</artifactId>
+            <version>0.3.23-${javacv.version}</version>
+            <classifier>${system.windowsx64}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>openblas</artifactId>
+            <version>0.3.23-${javacv.version}</version>
+            <classifier>${system.liunx64}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>flycapture</artifactId>
+            <version>2.13.3.31-${javacv.version}</version>
+            <classifier>${system.windowsx64}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>flycapture</artifactId>
+            <version>2.13.3.31-${javacv.version}</version>
+            <classifier>${system.liunx64}</classifier>
         </dependency>
 
 
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
-        </dependency>
+
+
     </dependencies>
 
 
