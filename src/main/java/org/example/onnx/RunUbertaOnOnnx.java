@@ -3,6 +3,7 @@ package org.example.onnx;
 
 import ai.onnxruntime.*;
 import cn.hutool.core.collection.ListUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.example.onnx.tokenizer.BertTokenizer;
@@ -15,6 +16,16 @@ import java.util.Map;
  *
  */
 public class RunUbertaOnOnnx {
+
+    public static void main(String[] args) {
+        try {
+            String query = "雷鸣山";
+            List<JSONObject> predict = predict(query);
+            System.out.println(JSON.toJSONString(predict));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static List<JSONObject> predict(String query) throws Exception {
         //Bert-Chinese-Text-Classification-Pytorch项目的 vocab.txt
@@ -36,8 +47,8 @@ public class RunUbertaOnOnnx {
 //        OrtCUDAProviderOptions cudaOpts = new OrtCUDAProviderOptions(0);
 //        cudaOpts.add("gpu_mem_limit", "" + (512 * 1024 * 1024));
 //        options.addCUDA(cudaOpts);
-        int gpuDeviceId = 0;
-        options.addCUDA(gpuDeviceId);
+//        int gpuDeviceId = 0;
+//        options.addCUDA(gpuDeviceId);
         /*GPU end----*/
         try (OrtSession session = env.createSession(modelPath, options)) {
             // Load code not shown for brevity.
